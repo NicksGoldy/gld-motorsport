@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GLR — Goldyland Racing</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,200;0,14..32,300;0,14..32,400;0,14..32,500;0,14..32,600;0,14..32,700;1,14..32,300&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#080808;--bg2:#101010;--bg3:#181818;--bg4:#1e1e1e;
+  --border:rgba(255,255,255,0.06);--border2:rgba(255,255,255,0.11);--border3:rgba(255,255,255,0.2);
+  --text:#efefef;--text2:#888;--text3:#444;
+  --gold:#C9A84C;--gold-dim:rgba(201,168,76,0.1);
+  --green:#22c55e;--green-dim:rgba(34,197,94,0.1);--green-border:rgba(34,197,94,0.3);
+  --red:#e8192c;
+  --ease-out:cubic-bezier(0.16,1,0.3,1);
+}
+html{scroll-behavior:smooth}
+body{font-family:'Inter',-apple-system,sans-serif;background:var(--bg);color:var(--text);-webkit-font-smoothing:antialiased;min-height:100vh}
+
+nav{position:fixed;top:0;left:0;right:0;z-index:200;height:58px;padding:0 2rem;display:flex;align-items:center;gap:1rem;background:rgba(8,8,8,0);border-bottom:0.5px solid rgba(255,255,255,0);transition:background 0.4s,border-color 0.4s}
+nav.scrolled{background:rgba(8,8,8,0.92);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);border-bottom-color:var(--border)}
+.nav-left{display:flex;align-items:center;gap:10px;flex-shrink:0}
+.nav-sep{width:0.5px;height:20px;background:var(--border3);margin:0 4px;flex-shrink:0}
+.nav-series{font-size:11px;color:var(--text3);letter-spacing:1px;text-transform:uppercase;white-space:nowrap}
+.nav-links{display:flex;gap:1.5rem;list-style:none;margin-left:auto}
+.nav-links a{font-size:11px;color:var(--text3);text-decoration:none;letter-spacing:1px;text-transform:uppercase;transition:color 0.15s;white-space:nowrap}
+.nav-links a:hover,.nav-links a.active{color:var(--text)}
+.nav-join{display:flex;align-items:center;gap:7px;padding:6px 14px;border-radius:100px;background:rgba(34,197,94,0.1);border:0.5px solid rgba(34,197,94,0.3);font-size:11px;font-weight:500;color:var(--green);text-decoration:none;transition:all 0.15s;white-space:nowrap;flex-shrink:0}
+.nav-join:hover{background:rgba(34,197,94,0.18);border-color:rgba(34,197,94,0.5)}
+.nav-pulse{width:6px;height:6px;border-radius:50%;background:var(--green);animation:np 2s ease-in-out infinite;flex-shrink:0}
+@keyframes np{0%,100%{opacity:1;transform:scale(1)}50%{opacity:0.4;transform:scale(0.75)}}
+
+.hero{
+  min-height:100vh;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;
+  padding:7rem 2rem 5rem;text-align:center;position:relative;overflow:hidden;
+}
+.hero::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 55% 50% at 50% 55%,rgba(201,168,76,0.05) 0%,transparent 70%);pointer-events:none}
+.hero-logo{opacity:0;transform:translateY(20px);animation:fu 0.9s var(--ease-out) 0.1s forwards}
+.hero-eyebrow{font-size:10px;letter-spacing:4px;text-transform:uppercase;color:var(--text3);margin-bottom:1.25rem;opacity:0;animation:fu 0.8s var(--ease-out) 0.3s forwards}
+.hero h1{font-size:clamp(2.5rem,6vw,5rem);font-weight:200;letter-spacing:-2.5px;line-height:1;margin-bottom:1rem;opacity:0;animation:fu 1s var(--ease-out) 0.4s forwards}
+.hero h1 em{font-style:italic;font-weight:300;color:var(--gold)}
+.hero-sub{font-size:15px;color:var(--text2);max-width:440px;font-weight:300;line-height:1.8;margin-bottom:3.5rem;opacity:0;animation:fu 0.9s var(--ease-out) 0.55s forwards}
+
+/* CARD GRID */
+.card-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
+  gap:14px;width:100%;max-width:900px;
+  opacity:0;animation:fu 0.9s var(--ease-out) 0.7s forwards;
+}
+.hub-card{
+  background:var(--bg2);border:0.5px solid var(--border);
+  border-radius:20px;padding:2rem;
+  display:flex;flex-direction:column;gap:0.75rem;
+  text-decoration:none;color:var(--text);
+  transition:transform 0.12s,border-color 0.12s,box-shadow 0.12s;
+  cursor:pointer;position:relative;overflow:hidden;
+  text-align:left;
+}
+.hub-card::before{content:'';position:absolute;inset:0;border-radius:20px;opacity:0;transition:opacity 0.15s}
+.hub-card:hover{transform:translateY(-6px) scale(1.015)}
+
+.hub-card.wec{border-left:2px solid var(--red)}
+.hub-card.wec:hover{border-color:var(--red);box-shadow:0 16px 48px rgba(232,25,44,0.15),0 0 0 0.5px var(--red)}
+.hub-card.gtwc{border-left:2px solid #3b82f6}
+.hub-card.gtwc:hover{border-color:#3b82f6;box-shadow:0 16px 48px rgba(59,130,246,0.15),0 0 0 0.5px #3b82f6}
+.hub-card.start{border-left:2px solid var(--gold)}
+.hub-card.start:hover{border-color:var(--gold);box-shadow:0 16px 48px rgba(201,168,76,0.15),0 0 0 0.5px var(--gold)}
+.hub-card.server{border-left:2px solid var(--green)}
+.hub-card.server:hover{border-color:var(--green);box-shadow:0 16px 48px rgba(34,197,94,0.15),0 0 0 0.5px var(--green)}
+.hub-card.sheet{border-left:2px solid #a855f7}
+.hub-card.sheet:hover{border-color:#a855f7;box-shadow:0 16px 48px rgba(168,85,247,0.15),0 0 0 0.5px #a855f7}
+
+.card-icon{font-size:1.75rem;margin-bottom:0.25rem}
+.card-label{font-size:9px;letter-spacing:2.5px;text-transform:uppercase;font-weight:600;margin-bottom:2px}
+.card-label.red{color:var(--red)}
+.card-label.blue{color:#3b82f6}
+.card-label.gold{color:var(--gold)}
+.card-label.green{color:var(--green)}
+.card-label.purple{color:#a855f7}
+.card-title{font-size:18px;font-weight:600;letter-spacing:-0.3px;color:var(--text)}
+.card-desc{font-size:13px;color:var(--text2);font-weight:300;line-height:1.6}
+.card-arrow{margin-top:auto;padding-top:1rem;font-size:11px;display:flex;align-items:center;gap:5px;transition:gap 0.15s}
+.hub-card:hover .card-arrow{gap:8px}
+.card-arrow svg{width:13px;height:13px}
+
+footer{border-top:0.5px solid var(--border);padding:2.5rem;text-align:center}
+footer .f1{font-size:13px;color:var(--text3)}
+footer .f2{font-size:11px;color:var(--text3);margin-top:6px;font-style:italic;opacity:0.5}
+.gold{color:var(--gold)}
+@keyframes fu{to{opacity:1;transform:none}
+</style>
+</head>
+<body>
+
+<nav id="nav">
+  <div class="nav-left">
+    <a href="index.html"><svg viewBox="0 0 178 50" xmlns="http://www.w3.org/2000/svg" style="height:34px;width:auto;display:block;flex-shrink:0">
+  <defs><linearGradient id="gn" x1="0%" y1="0%" x2="100%" y2="100%">
+    <stop offset="0%" style="stop-color:#6b4f10"><animate attributeName="stop-color" values="#6b4f10;#e8c45a;#c9a84c;#f5d978;#6b4f10" dur="2.8s" repeatCount="indefinite"/></stop>
+    <stop offset="50%" style="stop-color:#f5d978"><animate attributeName="stop-color" values="#c9a84c;#6b4f10;#f5d978;#8b6914;#c9a84c" dur="2.8s" repeatCount="indefinite"/></stop>
+    <stop offset="100%" style="stop-color:#8b6914"><animate attributeName="stop-color" values="#f5d978;#c9a84c;#6b4f10;#e8c45a;#f5d978" dur="2.8s" repeatCount="indefinite"/></stop>
+  </linearGradient></defs>
+  <text x="1" y="31" font-family="Arial Black,sans-serif" font-weight="900" font-size="36" fill="none" stroke="url(#gn)" stroke-width="2.5" stroke-linejoin="round" font-style="italic" letter-spacing="-1">GLR</text>
+  <text x="1" y="31" font-family="Arial Black,sans-serif" font-weight="900" font-size="36" fill="#ffffff" font-style="italic" letter-spacing="-1">GLR</text>
+  <rect x="1"  y="34" width="9" height="4" fill="#CC1418" rx="0.5"/>
+  <rect x="12" y="34" width="9" height="4" fill="#f0f0f0" rx="0.5"/>
+  <rect x="23" y="34" width="9" height="4" fill="#CC1418" rx="0.5"/>
+  <rect x="34" y="34" width="9" height="4" fill="#f0f0f0" rx="0.5"/>
+  <rect x="45" y="34" width="9" height="4" fill="#CC1418" rx="0.5"/>
+  <rect x="56" y="34" width="9" height="4" fill="#f0f0f0" rx="0.5"/>
+  <text x="1" y="47" font-family="Arial,sans-serif" font-weight="300" font-size="9" fill="#3a3a3a" letter-spacing="3.8">RACING</text>
+</svg></a>
+    
+  </div>
+  <ul class="nav-links">
+    <li><a href="index.html" class="active">Home</a></li>
+    <li><a href="wec.html">WEC</a></li>
+    <li><a href="gtwc.html">GT World Challenge</a></li>
+    <li><a href="start-here.html">Start Here</a></li>
+    
+  </ul>
+  <a href="https://acstuff.club/s/q:race/online/join?ip=131.153.152.218&httpPort=28143" target="_blank" class="nav-join">
+    <span class="nav-pulse"></span>Join Server
+  </a>
+</nav>
+
+<div class="hero">
+  <div class="hero-logo"><svg viewBox="0 0 220 60" xmlns="http://www.w3.org/2000/svg" style="height:72px;width:auto;display:block;margin:0 auto 2rem">
+  <defs><linearGradient id="gh" x1="0%" y1="0%" x2="100%" y2="100%">
+    <stop offset="0%" style="stop-color:#6b4f10"><animate attributeName="stop-color" values="#6b4f10;#e8c45a;#c9a84c;#f5d978;#6b4f10" dur="2.8s" repeatCount="indefinite"/></stop>
+    <stop offset="50%" style="stop-color:#f5d978"><animate attributeName="stop-color" values="#c9a84c;#6b4f10;#f5d978;#8b6914;#c9a84c" dur="2.8s" repeatCount="indefinite"/></stop>
+    <stop offset="100%" style="stop-color:#8b6914"><animate attributeName="stop-color" values="#f5d978;#c9a84c;#6b4f10;#e8c45a;#f5d978" dur="2.8s" repeatCount="indefinite"/></stop>
+  </linearGradient></defs>
+  <text x="1" y="38" font-family="Arial Black,sans-serif" font-weight="900" font-size="44" fill="none" stroke="url(#gh)" stroke-width="3" stroke-linejoin="round" font-style="italic" letter-spacing="-2">GLR</text>
+  <text x="1" y="38" font-family="Arial Black,sans-serif" font-weight="900" font-size="44" fill="#ffffff" font-style="italic" letter-spacing="-2">GLR</text>
+  <rect x="1"  y="42" width="11" height="5" fill="#CC1418" rx="0.5"/>
+  <rect x="14" y="42" width="11" height="5" fill="#f0f0f0" rx="0.5"/>
+  <rect x="27" y="42" width="11" height="5" fill="#CC1418" rx="0.5"/>
+  <rect x="40" y="42" width="11" height="5" fill="#f0f0f0" rx="0.5"/>
+  <rect x="53" y="42" width="11" height="5" fill="#CC1418" rx="0.5"/>
+  <rect x="66" y="42" width="11" height="5" fill="#f0f0f0" rx="0.5"/>
+  <text x="1" y="57" font-family="Arial,sans-serif" font-weight="300" font-size="10" fill="#555" letter-spacing="5">GOLDYLAND RACING</text>
+</svg></div>
+  <p class="hero-eyebrow">Est. 2023 — Assetto Corsa</p>
+  <h1>Welcome to<br><em>Goldyland Racing.</em></h1>
+  <p class="hero-sub">A private Assetto Corsa community built around high-quality mods and clean racing. Everything you need is below.</p>
+
+  <div class="card-grid">
+
+    <a href="wec.html" class="hub-card wec" style="animation:cardIn 0.5s var(--ease-out) 0.75s both">
+      <div class="card-icon">🏆</div>
+      <div class="card-label red">Series</div>
+      <div class="card-title">FIA WEC</div>
+      <div class="card-desc">GTP Hypercar, LMP2, and GT3. The full World Endurance Championship car and track grid.</div>
+      <div class="card-arrow" style="color:var(--red)">View Series <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 8h10M9 4l4 4-4 4"/></svg></div>
+    </a>
+
+    <a href="gtwc.html" class="hub-card gtwc" style="animation:cardIn 0.5s var(--ease-out) 0.82s both">
+      <div class="card-icon">🏎</div>
+      <div class="card-label blue">Series</div>
+      <div class="card-title">GT World Challenge</div>
+      <div class="card-desc">GT3 racing across three continents. America, Europe, and Asia & Australia.</div>
+      <div class="card-arrow" style="color:#3b82f6">View Series <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 8h10M9 4l4 4-4 4"/></svg></div>
+    </a>
+
+    <a href="start-here.html" class="hub-card start" style="animation:cardIn 0.5s var(--ease-out) 0.89s both">
+      <div class="card-icon">🚀</div>
+      <div class="card-label gold">Setup Guide</div>
+      <div class="card-title">Start Here</div>
+      <div class="card-desc">New to the server? Five steps to get fully set up and racing — everything is free.</div>
+      <div class="card-arrow" style="color:var(--gold)">Get Started <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 8h10M9 4l4 4-4 4"/></svg></div>
+    </a>
+
+    <a href="https://acstuff.club/s/q:race/online/join?ip=131.153.152.218&httpPort=28143" target="_blank" class="hub-card server" style="animation:cardIn 0.5s var(--ease-out) 0.96s both">
+      <div class="card-icon">🏁</div>
+      <div class="card-label green">Live Server</div>
+      <div class="card-title">Join Server</div>
+      <div class="card-desc">Opens Content Manager and connects you directly. Make sure Assetto Corsa is running first.</div>
+      <div class="card-arrow" style="color:var(--green)">Connect Now <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 8h10M9 4l4 4-4 4"/></svg></div>
+    </a>
+
+    <a href="https://docs.google.com/spreadsheets/d/1i-kKJfzNm4SB3UpFlDX09LVbGeZBCg6Y9KGQVXICwW8/edit?usp=sharing" target="_blank" class="hub-card sheet" style="animation:cardIn 0.5s var(--ease-out) 1.03s both">
+      <div class="card-icon">📋</div>
+      <div class="card-label purple">Reference</div>
+      <div class="card-title">Master Sheet</div>
+      <div class="card-desc">The full mod library — every car, track, and pack with download links. Updated regularly.</div>
+      <div class="card-arrow" style="color:#a855f7">Open Sheet <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 8h10M9 4l4 4-4 4"/></svg></div>
+    </a>
+
+  </div>
+</div>
+
+<footer>
+  <p class="f1"><span class="gold">GLR</span> — Goldyland Racing, Est. 2023</p>
+  <p class="f2">Assetto Corsa Community Hub</p>
+</footer>
+
+<script>
+const nav=document.getElementById('nav');
+window.addEventListener('scroll',()=>nav.classList.toggle('scrolled',scrollY>40),{passive:true});
+</script>
+<style>@keyframes cardIn{from{opacity:0;transform:translateY(24px) scale(0.97)}to{opacity:1;transform:none}</style>
+</body>
+</html>
