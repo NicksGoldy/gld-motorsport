@@ -1,2 +1,2 @@
-# gld-motorsport
-Full Mod Pages for GLD - Goldyland
+# Goldyland
+Full Mod Pages for GLR - Goldyland Racing est. 2023
